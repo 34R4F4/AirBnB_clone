@@ -1,82 +1,94 @@
 #!/usr/bin/python3
 """
-Class
-    a) BaseModel.
+BaseModel Module
+
+    Author: Arafa Khalaf
+    Version: 1.0
+    Path: models/base_model.py
 """
+
 import uuid
 from datetime import datetime
-import models
 
 
 class BaseModel:
     """
     Class:
-        BaseModel that defines all common attributes/methods
-        for other classes.
+        BaseModel: defines all common attributes/methods for other classes
 
     Attributes:
-        id (str):
-            ID unique of object.
-        created_at (datetime):
-            Datetime when an instance is created.
-        updated_at (datetime):
-            Datetime when an instance is created, and it will be updated.
+        id (str): The unique identifier for BaseModel.
+        created_at (datetime): The creation datetime of the BaseModel.
+        updated_at (datetime): The last update datetime of the BaseModel.
     """
 
-    def __init__(self, *args, **kwargs):
+    """
+    Public instance attributes:
+    id
+    created_at
+    updated_at
+    """
+    def __init__(self):
         """
-        Construct (replace):
-                BaseModel object.
-
-        Args:
-            *args (tuple):
-                Non-keyword variable length argument list.
-            **kwargs (dict):
-                Keyword variable length of arguments.
+        Initializes the BaseModel Public instance attributes
+        (id, created_at, updated_at)
         """
-        if len(kwargs) > 0:
-            for key, value in kwargs.items():
-                if key in ["created_at", "updated_at"]:
-                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                if key != "__class__":
-                    setattr(self, key, value)
-        else:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = self.created_at
-            models.storage.new(self)
 
+        """id"""
+        # Creating a unique identifier using uuid.uuid4()
+        self.id = uuid.uuid4()
+        # Convert the unique identifier to string
+        self.id = str(self.id)
+
+        """created_at"""
+        # Set the creation time to the current datetime
+        self.created_at = datetime.now()
+
+        """updated_at"""
+        # Set the initial update time to the creation time
+        self.updated_at = self.created_at
+
+    """__str__"""
     def __str__(self):
         """
-        Method (replace):
-            Represents the class objects as a string in format.
+        Returns a human-readable representation of of the BaseModel object.
 
-        Return:
-            String in  format '[<class name>] (<self.id>) <self.__dict__>'.
+        Returns:
+            str: [<class name>] (<self.id>) <self.__dict__>
         """
-        class_str = "[{}] ({}) {}".format(
-            self.__class__.__name__, self.id, self.__dict__)
-        return class_str
+        return "[{}] ({}) {}".format(
+                self.__class__.__name__, self.id, self.__dict__)
+
+    """
+    Public instance methods:
+    save(self)
+    to_dict(self)
+    """
 
     def save(self):
         """
-        Method:
-            Update auditory date and save change.
+        updates the public instance attribute updated_at
+        with the current datetime
         """
-        # note!: According to review it should be datetime.utcnow().
         self.updated_at = datetime.now()
-        models.storage.save()
 
     def to_dict(self):
         """
-        Method:
-            Generate dictionary of the class.
+        Converts the BaseModel instance to a dictionary representation.
 
-        Return:
-            A dictionary containing all keys/values of __dict__ the instance.
+        Returns:
+            dict: A dictionary
+            containing all keys/values of __dict__ of the instance,
+            along with class name, created_at, and updated_at in ISO format.
         """
-        class_dict = self.__dict__.copy()
-        class_dict['__class__'] = self.__class__.__name__
-        class_dict['created_at'] = class_dict['created_at'].isoformat()
-        class_dict['updated_at'] = class_dict['updated_at'].isoformat()
-        return class_dict
+        # Create a dictionary representation of the instance's attributes
+        model_dict = self.__dict__.copy()
+
+        # Add '__class__' key with the class name of the object
+        model_dict['__class__'] = self.__class__.__name__
+
+        # Convert created_at and updated_at to ISO format strings
+        model_dict['created_at'] = self.created_at.isoformat()
+        model_dict['updated_at'] = self.updated_at.isoformat()
+
+        return model_dict

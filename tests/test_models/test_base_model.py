@@ -2,7 +2,7 @@
 
 import unittest
 from datetime import datetime
-from base_model import BaseModel  # Assuming BaseModel is defined in base_model.py
+from base_model import BaseModel  # base_model.py >> class BaseModel
 
 
 class TestBaseModel(unittest.TestCase):
