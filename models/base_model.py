@@ -3,7 +3,7 @@
 BaseModel Module
 
     Author: Arafa Khalaf
-    Version: 1.0
+    Version: 1.1
     Path: models/base_model.py
 """
 
@@ -28,17 +28,32 @@ class BaseModel:
     created_at
     updated_at
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Initializes the BaseModel Public instance attributes
         (id, created_at, updated_at)
+
+        Args:
+            *args: Not used.
+            **kwargs: Keyword arguments representing attribute names and values
+                for recreating the instance from a dictionary representation.
         """
 
-        """id"""
-        # Creating a unique identifier using uuid.uuid4()
-        self.id = uuid.uuid4()
-        # Convert the unique identifier to string
-        self.id = str(self.id)
+        if kwargs:  # If kwargs is not empty
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    if key in ['created_at', 'updated_at']:
+                        # Convert string datetime to datetime object
+                        setattr(self, key, datetime.strptime(
+                            value, '%Y-%m-%dT%H:%M:%S.%f'))
+                    else:
+                        setattr(self, key, value)
+        else:  # If kwargs is empty
+            """id"""
+            # Creating a unique identifier using uuid.uuid4()
+            self.id = uuid.uuid4()
+            # Convert the unique identifier to string
+            self.id = str(self.id)
 
         """created_at"""
         # Set the creation time to the current datetime
